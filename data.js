@@ -21,7 +21,21 @@ async function handleRequest(request) {
 
     try {
       const response = await fetch(apiUrl)
-      const data = await response.json()
+
+      // Periksa apakah respons dari API valid
+      if (!response.ok) {
+        throw new Error(`API returned status ${response.status}: ${response.statusText}`)
+      }
+
+      // Coba parsing respons sebagai JSON
+      let data
+      try {
+        data = await response.json()
+      } catch (error) {
+        // Jika parsing JSON gagal, tampilkan respons mentah dari API
+        const rawResponse = await response.text()
+        throw new Error(`API response is not valid JSON. Raw response: ${rawResponse}`)
+      }
 
       // Membuat HTML untuk menampilkan hasil pencarian
       const htmlResponse = `
@@ -30,7 +44,7 @@ async function handleRequest(request) {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Search Results for ${query}</title>
+          <title>Search Results for "${query}"</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             .result { margin-bottom: 20px; }
@@ -55,7 +69,8 @@ async function handleRequest(request) {
         headers: { 'Content-Type': 'text/html' }
       })
     } catch (error) {
-      return new Response(`Failed to fetch search results ${error} ${error.status} ${error.message}`, {
+      // Tangani error dan tampilkan pesan error yang informatif
+      return new Response(`Failed to fetch search results: ${error.message}`, {
         headers: { 'Content-Type': 'text/html' },
         status: 500
       })
@@ -79,7 +94,7 @@ async function handleRequest(request) {
       </style>
     </head>
     <body>
-      <h1>Search Engine</h1>
+      <h1>My Search Engine</h1>
       <form action="/search" method="GET">
         <input type="text" name="q" placeholder="Enter your search query" required>
         <input type="text" name="tbm" placeholder="Search type (optional)">
@@ -92,4 +107,4 @@ async function handleRequest(request) {
   return new Response(htmlForm, {
     headers: { 'Content-Type': 'text/html' }
   })
-}
+          }
