@@ -79,7 +79,7 @@ async function searchindex(request) {
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
       handleRequest(responseClone, tbm);
-      return new Response(responseClone, {
+      return new Response(htmlResponse, {
         headers: { 'Content-Type': 'text/html' }
       })
       
