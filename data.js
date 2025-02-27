@@ -28,13 +28,7 @@ async function handleSearch(request) {
     const apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${encodeURIComponent(q)}&hl=${hl}&tbm=${tbm}`;
 
     try {
-        const response = await fetch(apiUrl, {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "User-Agent": "Cloudflare-Worker"
-            }
-        });
+        const response = await fetch(apiUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
 
         if (!response.ok) {
             return new Response(generateHTML("Terjadi kesalahan dalam pencarian.", q), {
