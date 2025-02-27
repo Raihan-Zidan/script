@@ -66,18 +66,12 @@ async function handleRequest(request) {
         </body>
         </html>
       `
-      const responseClone = new Response(`${htmlResponse}`, {
-  headers: { "Content-Type": "text/html" }
-});
+            const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
-return new HTMLRewriter()
-  .on(".search-item", new SearchItemHandler(tbm))
-  .transform(responseClone);
+      return new HTMLRewriter()
+        .on(".search-item", new SearchItemHandler(tbm))
+        .transform(responseClone);
       
-
-      return new Response(htmlResponse, {
-        headers: { 'Content-Type': 'text/html' }
-      })
     } catch (error) {
       // Tangani error dan tampilkan pesan error di halaman HTML
       const errorHtml = `
@@ -146,19 +140,17 @@ class SearchItemHandler {
   }
 
   element(element) {
-    // Tentukan elemen mana yang harus dipilih berdasarkan tbm
     const selectedIndex = this.getSelectedIndex();
     if (this.index === selectedIndex) {
-      element.classList.add("selected");
+      element.setAttribute("class", "search-item selected");
     }
     this.index++;
   }
 
   getSelectedIndex() {
-    if (this.tbm === "vid") return 2;
     if (this.tbm === "isch") return 1;
-    if (this.tbm === "nws") return
- 3;
-    return 0; // Default
+    if (this.tbm === "vid") return 2;
+    if (this.tbm === "nws") return 3;
+    return 0;
   }
 }
