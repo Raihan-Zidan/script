@@ -62,7 +62,7 @@ async function handleRequest(request) {
         </head>
         <body>
           <h1>Search Results for "${query}"</h1>
-          ${data.results.map(result => `
+          ${data.items.map(result => `
             <div class="result">
               <div class="title"><a href="${result.link}" class="link">${result.title}</a></div>
               <div class="snippet">${result.snippet}</div>
