@@ -16,7 +16,7 @@ async function handleSearch(request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim();
     const hl = searchParams.get("hl") || "id";
-    const tbm = searchParams.get("tbm") || "web"; // Default pencarian web
+    const tbm = searchParams.get("tbm") || ""; // Default pencarian web
 
     if (!q) {
         return new Response(generateHTML("Silakan masukkan kata kunci pencarian.", ""), {
@@ -56,7 +56,7 @@ async function handleSearch(request) {
 }
 
 // Fungsi untuk membuat HTML berdasarkan hasil pencarian
-function generateHTML(results = null, query = "") {
+function generateHTML(results, query) {
     const title = query ? `${query} - Pencarian` : "Mesin Pencarian";
 
     return `
