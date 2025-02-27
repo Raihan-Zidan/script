@@ -94,6 +94,7 @@ function generateHTML(results, query) {
 
 // Fungsi untuk merender hasil pencarian dalam HTML
 function renderResults(results) {
+    return results;
     if (!results.items || results.items.length === 0) {
         return `<p>Tidak ada hasil ditemukan.</p>`;
     }
