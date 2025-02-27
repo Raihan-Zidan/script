@@ -79,7 +79,7 @@ async function searchindex(request) {
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
       handleRequest(responseClone, tbm);
-      return new Response(htmlResponse, {
+      return new Response(responseClone, {
         headers: { 'Content-Type': 'text/html' }
       })
       
@@ -204,7 +204,9 @@ class InsertInstantAnswer {
 }
 
 async function modifyResponse(response, selector, content, index) {
-  const responseText = await response.text(); // Ambil teks HTML dari Response
+  const responseClone = response.clone(); // Clone dulu sebelum dipakai
+  const responseText = await responseClone.text(); // Ambil teks HTML dari Response
+
   const modifiedResponse = new Response(responseText, { 
     headers: { "Content-Type": "text/html" } 
   });
@@ -215,12 +217,14 @@ async function modifyResponse(response, selector, content, index) {
 }
 
 async function handleRequest(response, tbm) {
-  const modifiedResponse = await modifyResponse(response, ".tab-result", `<div class="instant-answer"></div>`, 2);
+  // Pastikan response tidak digunakan lebih dari sekali tanpa clone
+  const modifiedResponse = await modifyResponse(response.clone(), ".tab-result", `<div class="instant-answer"></div>`, 2);
 
   return new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(modifiedResponse);
 }
+
 
 function hasilpencarian(type, html) {
 
