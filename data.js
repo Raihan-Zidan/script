@@ -66,7 +66,15 @@ async function handleRequest(request) {
         </body>
         </html>
       `
-
+      if (tbm == "vid") {
+      document.querySelectorAll(".search-item")[2].classList.add("selected");
+      } else if (tbm == "isch") {
+        document.querySelectorAll(".search-item")[1].classList.add("selected");
+      } else if (tbm == "nws") {
+        document.querySelectorAll(".search-item")[3].classList.add("selected");
+      } else {
+        document.querySelectorAll(".search-item")[0].classList.add("selected");
+      }
       return new Response(htmlResponse, {
         headers: { 'Content-Type': 'text/html' }
       })
