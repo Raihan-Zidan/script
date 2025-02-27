@@ -77,8 +77,10 @@ async function searchindex(request) {
           `).join('')}
       `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
-
-      handleRequest(responseClone, tbm);
+  return new HTMLRewriter()
+    .on(".search-item", new SearchItemHandler(tbm))
+    .transform(responseClone);
+      
       return new Response(responseClone, {
         headers: { 'Content-Type': 'text/html' }
       })
@@ -220,9 +222,7 @@ async function handleRequest(response, tbm) {
   // Pastikan response tidak digunakan lebih dari sekali tanpa clone
   const modifiedResponse = await modifyResponse(response.clone(), ".tab-result", `<div class="instant-answer"></div>`, 2);
 
-  return new HTMLRewriter()
-    .on(".search-item", new SearchItemHandler(tbm))
-    .transform(modifiedResponse);
+
 }
 
 
