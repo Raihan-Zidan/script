@@ -207,7 +207,8 @@ class InsertInstantAnswer {
 }
 
 async function modifyResponse(response, selector, content, index) {
-  const res = response.clone();
+
+  
   const responseText = response.text(); // Ambil teks HTML dari Response
 
   const modifiedResponse = new Response(responseText, { 
