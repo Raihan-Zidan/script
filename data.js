@@ -79,7 +79,9 @@ async function searchindex(request) {
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
       handleRequest(responseClone, tbm);
-      
+      return new Response(responseClone, {
+        headers: { 'Content-Type': 'text/html' }
+      })
       
     } catch (error) {
       // Tangani error dan tampilkan pesan error di halaman HTML
