@@ -1,4 +1,4 @@
-const GITHUB_TOKEN = "ghp_xxx"; // Ganti dengan token GitHub Anda
+const GITHUB_TOKEN = "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"; // Ganti dengan token GitHub Anda
 const GITHUB_REPO = "Raihan-Zidan/script";
 const FILE_PATH = "data.json";
 const SITE_TO_CRAWL = "https://kompas.com";
