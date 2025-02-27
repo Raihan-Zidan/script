@@ -1,130 +1,54 @@
+const GITHUB_TOKEN = "ghp_xxx"; // Ganti dengan token GitHub Anda
+const GITHUB_REPO = "Raihan-Zidan/script";
+const FILE_PATH = "data.json";
+const SITE_TO_CRAWL = "https://kompas.com";
+
+async function crawlWebsite() {
+  const response = await fetch(SITE_TO_CRAWL);
+  const html = await response.text();
+
+  // Ekstrak data dari halaman (contoh: daftar link)
+  const links = [...html.matchAll(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/g)].map(m => m[1]);
+
+  return { timestamp: new Date().toISOString(), links };
+}
+
+async function updateGitHub(data) {
+  const content = JSON.stringify(data, null, 2);
+  const encodedContent = btoa(unescape(encodeURIComponent(content)));
+
+  // Cek apakah file sudah ada di GitHub
+  const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`, {
+    headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: "application/vnd.github.v3+json" },
+  });
+
+  const json = await res.json();
+  const sha = json.sha; // SHA diperlukan untuk update file
+
+  // Commit perubahan ke GitHub
+  await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`, {
+    method: "PUT",
+    headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: "application/vnd.github.v3+json" },
+    body: JSON.stringify({
+      message: `Update data ${new Date().toISOString()}`,
+      content: encodedContent,
+      sha,
+    }),
+  });
+}
+
+// Menangani permintaan HTTP biasa
 export default {
-    async fetch(request) {
-        const url = new URL(request.url);
+  async fetch(request) {
+    const data = await crawlWebsite();
+    await updateGitHub(data);
+    return new Response(JSON.stringify({ status: "success", data }), { headers: { "Content-Type": "application/json" } });
+  },
 
-        if (url.pathname === "/search") {
-            return await handleSearch(request);
-        }
-
-        return new Response(generateHTML(), {
-            headers: { "Content-Type": "text/html" }
-        });
-    }
+  // Menangani event schedule dari Cloudflare Cron Triggers
+  async scheduled(event) {
+    console.log("Worker berjalan sesuai jadwal:", event.cron);
+    const data = await crawlWebsite();
+    await updateGitHub(data);
+  },
 };
-
-async function handleSearch(request) {
-    const { searchParams } = new URL(request.url);
-    const q = searchParams.get("q")?.trim();
-    const hl = searchParams.get("hl") || "id";
-    const tbm = searchParams.get("tbm") || ""; // Default pencarian web
-
-    if (!q) {
-        return new Response(generateHTML("Silakan masukkan kata kunci pencarian.", ""), {
-            headers: { "Content-Type": "text/html" }
-        });
-    }
-
-    // Buat URL API
-    const apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${encodeURIComponent(q)}&hl=${hl}&tbm=${tbm}`;
-
-    try {
-        const response = await fetch(apiUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
-        console.log(response.status);
-        if (!response.ok) {
-            return new Response(generateHTML("Terjadi kesalahan dalam pencarian.", q), {
-                headers: { "Content-Type": "text/html" }
-            });
-        }
-
-        const results = await response.json();
-
-        return new Response(generateHTML(results, q), {
-            headers: { "Content-Type": "text/html" }
-        });
-
-    } catch (error) {
-        return new Response(generateHTML("Gagal mengambil data dari API.", q), {
-            headers: { "Content-Type": "text/html" }
-        });
-        console.log(error.message);
-    }
-}
-
-// Fungsi untuk membuat HTML berdasarkan hasil pencarian
-function generateHTML(results, query) {
-    const title = query ? `${query} - Pencarian` : "Mesin Pencarian";
-
-    return `
-    <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title}</title>
-        <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .container { max-width: 600px; margin: 0 auto; }
-            .search-box { display: flex; gap: 10px; }
-            input[type="text"] { flex-grow: 1; padding: 10px; }
-            button { padding: 10px; cursor: pointer; }
-            .results { margin-top: 20px; }
-            .result-item { margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-            .thumbnail { width: 100px; height: auto; display: block; margin-top: 5px; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Pencarian</h1>
-            <form action="/search" method="GET" class="search-box">
-                <input type="text" name="q" value="${query}" placeholder="Cari sesuatu...">
-                <button type="submit">Cari</button>
-            </form>
-
-            ${results ? renderResults(results) : "<p>Silakan masukkan kata kunci untuk mencari.</p>"}
-        </div>
-    </body>
-    </html>
-    `;
-}
-
-// Fungsi untuk merender hasil pencarian dalam HTML
-function renderResults(results) {
-    return results;
-    if (!results.items || results.items.length === 0) {
-        return `<p>Tidak ada hasil ditemukan.</p>`;
-    }
-
-    return `
-    <div class="results">
-        ${results.items.map(item => `
-            <div class="result-item">
-                <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
-                <p>${item.snippet}</p>
-                <small>${item.displayLink}</small>
-                ${item.pagemap?.cse_thumbnail?.[0]?.src ? `<img class="thumbnail" src="${item.pagemap.cse_thumbnail[0].src}" alt="Thumbnail">` : ""}
-            </div>
-        `).join('')}
-    </div>
-    `;
-        }
-
-addEventListener("fetch", event => {
-  event.respondWith(handleRequest(event.request));
-});
-
-async function handleRequest(request) {
-  let logs = [];
-  
-  try {
-    logs.push("Worker executed at: " + new Date().toISOString());
-    
-    // Simulasi error
-    let error = new Error("Contoh error!");
-    logs.push("Error: " + error.message);
-    
-    return new Response(logs.join("\n"), { status: 200 });
-  } catch (err) {
-    logs.push("Unhandled error: " + err.message);
-    return new Response(logs.join("\n"), { status: 500 });
-  }
-}
