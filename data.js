@@ -17,6 +17,7 @@ async function handleRequest(request) {
       })
     }
 
+    // Pastikan URL API benar dan parameter di-encode dengan benar
     const apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${encodeURIComponent(query)}&tbm=${encodeURIComponent(tbm)}`
 
     try {
@@ -24,7 +25,12 @@ async function handleRequest(request) {
 
       // Periksa apakah respons dari API valid
       if (!response.ok) {
-        throw new Error(`API returned status ${response.status}: ${response.statusText}`)
+        const errorDetails = {
+          status: response.status,
+          statusText: response.statusText,
+          url: apiUrl
+        }
+        throw new Error(`API returned an error: ${JSON.stringify(errorDetails)}`)
       }
 
       // Coba parsing respons sebagai JSON
@@ -51,6 +57,7 @@ async function handleRequest(request) {
             .title { font-size: 18px; font-weight: bold; }
             .link { color: #1a0dab; text-decoration: none; }
             .snippet { color: #4d5156; }
+            .error { color: red; margin-top: 20px; }
           </style>
         </head>
         <body>
@@ -69,8 +76,28 @@ async function handleRequest(request) {
         headers: { 'Content-Type': 'text/html' }
       })
     } catch (error) {
-      // Tangani error dan tampilkan pesan error yang informatif
-      return new Response(`Failed to fetch search results: ${error.message}`, {
+      // Tangani error dan tampilkan pesan error di halaman HTML
+      const errorHtml = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Error</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .error { color: red; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>Error</h1>
+          <div class="error">${error.message}</div>
+          <p>Please check the API URL and try again.</p>
+        </body>
+        </html>
+      `
+
+      return new Response(errorHtml, {
         headers: { 'Content-Type': 'text/html' },
         status: 500
       })
@@ -107,4 +134,4 @@ async function handleRequest(request) {
   return new Response(htmlForm, {
     headers: { 'Content-Type': 'text/html' }
   })
-          }
+}
