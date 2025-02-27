@@ -72,7 +72,7 @@ async function searchindex(request) {
       const htmlResponse = sethtml(`
 
           ${data.items.map(item => `
-  <div class="VtuHV Kj7VF tab-result eb8xCva"><div class="tab-link"  data-number=""><a href="${item.link}"><div class="top"><div class="favicon"><img src="https://datasearch.raihan-zidan2709.workers.dev/favicon?url=${item.link}"></div><div class="link-rw"><div class="link"></div><div class="link k">https://${item.displayLink}</div></div></div><div class="title">${item.title}</div></a></div><div class="btm-snpt"><div class="snippet">${item.snippet}</div></div></div>
+  <div class="VtuHV Kj7VF tab-result eb8xCva"><div class="tab-link"  data-number=""><a href="${item.link}"><div class="top"><div class="favicon"><img src="https://datasearch.raihan-zidan2709.workers.dev/favicon?url=${item.displayLink}"></div><div class="link-rw"><div class="link">${item?.pagemap?.metatags?.[0]?.['og:site_name'] ?? item.displayLink}</div><div class="link k">https://${item.displayLink}</div></div></div><div class="title">${item.title}</div></a></div><div class="btm-snpt"><div class="snippet">${item.snippet}</div></div></div>
   
           `).join('')}
       `, query)
