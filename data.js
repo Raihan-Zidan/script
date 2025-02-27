@@ -78,10 +78,8 @@ async function searchindex(request) {
       `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
-      modifyResponse(responseClone, ".tab-result", `<div class="instant-answer"></div>`, 2);
-      return new HTMLRewriter()
-        .on(".search-item", new SearchItemHandler(tbm))
-        .transform(responseClone);
+      handleRequest(responseClone, tbm);
+      
       
     } catch (error) {
       // Tangani error dan tampilkan pesan error di halaman HTML
@@ -203,10 +201,23 @@ class InsertInstantAnswer {
   }
 }
 
-function modifyResponse(response, selector, content, index) {
+async function modifyResponse(response, selector, content, index) {
+  const responseText = await response.text(); // Ambil teks HTML dari Response
+  const modifiedResponse = new Response(responseText, { 
+    headers: { "Content-Type": "text/html" } 
+  });
+
   return new HTMLRewriter()
     .on(selector, new InsertInstantAnswer(content, index))
-    .transform(response);
+    .transform(modifiedResponse);
+}
+
+async function handleRequest(response, tbm) {
+  const modifiedResponse = await modifyResponse(response, ".tab-result", `<div class="instant-answer"></div>`, 2);
+
+  return new HTMLRewriter()
+    .on(".search-item", new SearchItemHandler(tbm))
+    .transform(modifiedResponse);
 }
 
 function hasilpencarian(type, html) {
