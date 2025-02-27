@@ -51,15 +51,8 @@ async function handleRequest(request) {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Search Results for "${query}"</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .result { margin-bottom: 20px; }
-            .title { font-size: 18px; font-weight: bold; }
-            .link { color: #1a0dab; text-decoration: none; }
-            .snippet { color: #4d5156; }
-            .error { color: red; margin-top: 20px; }
-          </style>
+          <title>${query} - Search</title>
+          <link rel="stylesheet" href="https://raihan-zidan.github.io/u3086.css" />
         </head>
         <body>
           ${data.items.map(item => `
