@@ -15,16 +15,14 @@ export default {
 async function handleSearch(request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim();
-    const hl = searchParams.get("hl") || "en";
+    const hl = searchParams.get("hl") || "id";
     const tbm = searchParams.get("tbm") || "web"; // Default ke pencarian web
 
     if (!q) {
-        return new Response(generateHTML("Silakan masukkan kata kunci pencarian."), {
+        return new Response(generateHTML("Silakan masukkan kata kunci pencarian.", ""), {
             headers: { "Content-Type": "text/html" }
         });
     }
-    const d = q || "";
-    const judul = q ? `${q} - Pencarian` : "";
 
     let apiUrl;
     if (tbm === "vid") {
@@ -40,24 +38,26 @@ async function handleSearch(request) {
         const results = await response.json();
 
         return new Response(generateHTML(results, q), {
-            headers: { "Content-Type": "text/json" }
+            headers: { "Content-Type": "text/html" } // ✅ Memastikan HTML dikembalikan
         });
     } catch (error) {
-        return new Response(generateHTML("Terjadi kesalahan dalam pencarian."), {
-            headers: { "Content-Type": "text/json" }
+        return new Response(generateHTML("Terjadi kesalahan dalam pencarian.", q), {
+            headers: { "Content-Type": "text/html" }
         });
     }
 }
 
 // Fungsi untuk membuat HTML secara dinamis
 function generateHTML(results = null, query = "") {
+    const title = query ? `${query} - Pencarian` : "Halaman Pencarian";
+    
     return `
     <!DOCTYPE html>
     <html lang="id">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${judul}</title>
+        <title>${title}</title>
         <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             .container { max-width: 600px; margin: 0 auto; }
@@ -72,7 +72,7 @@ function generateHTML(results = null, query = "") {
         <div class="container">
             <h1>Pencarian</h1>
             <form action="/search" method="GET" class="search-box">
-                <input type="text" name="q" value="${d}" placeholder="Cari sesuatu..." value="${query}">
+                <input type="text" name="q" value="${query}" placeholder="Cari sesuatu...">
                 <button type="submit">Cari</button>
             </form>
 
