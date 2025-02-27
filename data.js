@@ -107,3 +107,24 @@ function renderResults(results) {
     </div>
     `;
         }
+
+addEventListener("fetch", event => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  let logs = [];
+  
+  try {
+    logs.push("Worker executed at: " + new Date().toISOString());
+    
+    // Simulasi error
+    let error = new Error("Contoh error!");
+    logs.push("Error: " + error.message);
+    
+    return new Response(logs.join("\n"), { status: 200 });
+  } catch (err) {
+    logs.push("Unhandled error: " + err.message);
+    return new Response(logs.join("\n"), { status: 500 });
+  }
+}
