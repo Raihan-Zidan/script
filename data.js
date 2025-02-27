@@ -46,7 +46,7 @@ async function searchindex(request) {
 
     try {
       const response = await fetch(googleSearchURL)
-
+      let instant;
       // Periksa apakah respons dari API valid
       if (!response.ok) {
         const errorDetails = {
@@ -55,6 +55,9 @@ async function searchindex(request) {
           url: googleSearchURL
         }
         throw new Error(`API returned an error: ${JSON.stringify(errorDetails)}`)
+      }
+      if (!tbm) {
+        instant = await fetch (`https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`)
       }
 
       // Coba parsing respons sebagai JSON
