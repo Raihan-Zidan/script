@@ -66,10 +66,14 @@ async function handleRequest(request) {
         </body>
         </html>
       `
+      const responseClone = new Response(`${htmlResponse}`, {
+  headers: { "Content-Type": "text/html" }
+});
 
-  return new HTMLRewriter()
-    .on(".search-item", new SearchItemHandler(tbm))
-    .transform(htmlResponse);
+return new HTMLRewriter()
+  .on(".search-item", new SearchItemHandler(tbm))
+  .transform(responseClone);
+      
 
       return new Response(htmlResponse, {
         headers: { 'Content-Type': 'text/html' }
