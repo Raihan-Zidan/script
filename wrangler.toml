@@ -6,3 +6,6 @@ compatibility_date = "2025-02-16"
 [observability]
 enabled = true
 head_sampling_rate = 1 # optional. default = 1.
+
+[triggers]
+crons = [ "*/30 * * * *" ] # Berjalan setiap 30 menit
