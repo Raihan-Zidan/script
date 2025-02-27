@@ -52,7 +52,7 @@ async function searchindex(request) {
         const errorDetails = {
           status: response.status,
           statusText: response.statusText,
-          url: apiUrl
+          url: googleSearchURL
         }
         throw new Error(`API returned an error: ${JSON.stringify(errorDetails)}`)
       }
