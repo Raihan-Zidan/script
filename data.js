@@ -46,7 +46,7 @@ async function searchindex(request) {
 
     try {
       const response = await fetch(googleSearchURL)
-      let instant;
+
       // Periksa apakah respons dari API valid
       if (!response.ok) {
         const errorDetails = {
@@ -55,9 +55,6 @@ async function searchindex(request) {
           url: googleSearchURL
         }
         throw new Error(`API returned an error: ${JSON.stringify(errorDetails)}`)
-      }
-      if (!tbm) {
-        instant = await fetch (`https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`)
       }
 
       // Coba parsing respons sebagai JSON
@@ -81,6 +78,7 @@ async function searchindex(request) {
       `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
+      modifyResponse(responseClone, ".tab-result", `<div class="instant-answer"></div>`, 2);
       return new HTMLRewriter()
         .on(".search-item", new SearchItemHandler(tbm))
         .transform(responseClone);
@@ -188,6 +186,27 @@ class SearchItemHandler {
     if (this.tbm === "nws") return 3;
     return 0;
   }
+}
+
+class InsertInstantAnswer {
+  constructor(content, index) {
+    this.content = content;
+    this.index = index;
+    this.count = 0;
+  }
+
+  element(element) {
+    if (this.count === this.index) {
+      element.append(this.content, { html: true });
+    }
+    this.count++;
+  }
+}
+
+function modifyResponse(response, selector, content, index) {
+  return new HTMLRewriter()
+    .on(selector, new InsertInstantAnswer(content, index))
+    .transform(response);
 }
 
 function hasilpencarian(type, html) {
