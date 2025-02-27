@@ -1,48 +1,101 @@
-addEventListener("fetch", event => {
-    event.respondWith(handleRequest(event.request));
-});
+export default {
+    async fetch(request) {
+        const url = new URL(request.url);
 
-async function handleRequest(request) {
-    // Hanya izinkan akses dari domain tertentu
-    const allowedOrigin = "https://raihan-zidan.github.io"; // Ganti dengan domain Anda
-
-    const referer = request.headers.get("Referer") || "";
-    
-    // Cek apakah request berasal dari halaman yang diizinkan
-    if (!referer.startsWith(allowedOrigin)) {
-        return new Response("Unauthorized", { status: 403 });
-    }
-    
-    let url = new URL(request.url);
-    let skrip = url.searchParams.get("g");
-
-    if (!skrip) {
-        return new Response("Parameter tidak valid", { status: 400 });
-    }
-
-    // Mapping file yang boleh diakses
-    const fileMap = {
-        "main": "https://raihan-zidan.github.io/script.js",
-        // Tambahkan file lain jika diperlukan
-    };
-
-    let targetURL = fileMap[skrip];
-    if (!targetURL) {
-        return new Response("File tidak ditemukan", { status: 404 });
-    }
-
-    let response = await fetch(targetURL);
-    let newHeaders = new Headers(response.headers);
-
-    // Mengatur CORS agar hanya bisa diakses dari domain tertentu
-    newHeaders.set("Access-Control-Allow-Origin", allowedOrigin);
-
-    return new Response(await response.text(), {
-        status: response.status,
-        headers: {
-            "Content-Type": "application/javascript",
-            "Access-Control-Allow-Origin": allowedOrigin, 
-            "Cache-Control": "no-store"
+        if (url.pathname === "/search") {
+            return await handleSearch(request);
         }
-    });
+
+        return new Response(generateHTML(), {
+            headers: { "Content-Type": "text/html" }
+        });
+    }
+};
+
+async function handleSearch(request) {
+    const { searchParams } = new URL(request.url);
+    const q = searchParams.get("q")?.trim();
+    const hl = searchParams.get("hl") || "en";
+    const tbm = searchParams.get("tbm") || "web"; // Default ke pencarian web
+
+    if (!q) {
+        return new Response(generateHTML("Silakan masukkan kata kunci pencarian."), {
+            headers: { "Content-Type": "text/html" }
+        });
+    }
+
+    let apiUrl;
+    if (tbm === "vid") {
+        apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${q}&tbm=vid&maxResults=100`;
+    } else if (tbm === "nws") {
+        apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${q}&hl=${hl}&tbm=nws`;
+    } else {
+        apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${q}&hl=${hl}`;
+    }
+
+    try {
+        const response = await fetch(apiUrl);
+        const results = await response.json();
+
+        return new Response(generateHTML(results, q), {
+            headers: { "Content-Type": "text/html" }
+        });
+    } catch (error) {
+        return new Response(generateHTML("Terjadi kesalahan dalam pencarian."), {
+            headers: { "Content-Type": "text/html" }
+        });
+    }
+}
+
+// Fungsi untuk membuat HTML secara dinamis
+function generateHTML(results = null, query = "") {
+    return `
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${query ? `${query} - Pencarian` : "Halaman Pencarian"}</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .search-box { display: flex; gap: 10px; }
+            input[type="text"] { flex-grow: 1; padding: 10px; }
+            button { padding: 10px; cursor: pointer; }
+            .results { margin-top: 20px; }
+            .result-item { margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Pencarian</h1>
+            <form action="/search" method="GET" class="search-box">
+                <input type="text" name="q" placeholder="Cari sesuatu..." value="${query}">
+                <button type="submit">Cari</button>
+            </form>
+
+            ${results ? renderResults(results) : ""}
+        </div>
+    </body>
+    </html>
+    `;
+}
+
+// Fungsi untuk merender hasil pencarian dalam HTML
+function renderResults(results) {
+    if (!results.items || results.items.length === 0) {
+        return `<p>Tidak ada hasil ditemukan.</p>`;
+    }
+
+    return `
+    <div class="results">
+        ${results.items.map(item => `
+            <div class="result-item">
+                <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
+                <p>${item.snippet}</p>
+                <small>${item.displayLink}</small>
+            </div>
+        `).join('')}
+    </div>
+    `;
 }
