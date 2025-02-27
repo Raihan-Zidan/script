@@ -5,6 +5,13 @@ addEventListener("fetch", event => {
 async function handleRequest(request) {
     // Hanya izinkan akses dari domain tertentu
     const allowedOrigin = "https://raihan-zidan.github.io"; // Ganti dengan domain Anda
+
+    const referer = request.headers.get("Referer") || "";
+    
+    // Cek apakah request berasal dari halaman yang diizinkan
+    if (!referer.startsWith(allowedOrigin)) {
+        return new Response("Unauthorized", { status: 403 });
+    }
     
     let url = new URL(request.url);
     let skrip = url.searchParams.get("g");
@@ -32,7 +39,10 @@ async function handleRequest(request) {
 
     return new Response(await response.text(), {
         status: response.status,
-        headers: newHeaders
+        headers: {
+            "Content-Type": "application/javascript",
+            "Access-Control-Allow-Origin": allowedOrigin, 
+            "Cache-Control": "no-store"
+        }
     });
- }
-                   
+}
