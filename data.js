@@ -29,7 +29,7 @@ async function handleSearch(request) {
 
     try {
         const response = await fetch(apiUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
-
+        console.log(response.status);
         if (!response.ok) {
             return new Response(generateHTML("Terjadi kesalahan dalam pencarian.", q), {
                 headers: { "Content-Type": "text/html" }
@@ -46,6 +46,7 @@ async function handleSearch(request) {
         return new Response(generateHTML("Gagal mengambil data dari API.", q), {
             headers: { "Content-Type": "text/html" }
         });
+        console.log(error.message);
     }
 }
 
