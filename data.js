@@ -16,7 +16,7 @@ async function handleSearch(request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim();
     const hl = searchParams.get("hl") || "id";
-    const tbm = searchParams.get("tbm") || "web"; // Default ke pencarian web
+    const tbm = searchParams.get("tbm") || "web"; // Default pencarian web
 
     if (!q) {
         return new Response(generateHTML("Silakan masukkan kata kunci pencarian.", ""), {
@@ -24,33 +24,41 @@ async function handleSearch(request) {
         });
     }
 
-    let apiUrl;
-    if (tbm === "vid") {
-        apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${q}&tbm=vid&maxResults=100`;
-    } else if (tbm === "nws") {
-        apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${q}&hl=${hl}&tbm=nws`;
-    } else {
-        apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${q}&hl=${hl}`;
-    }
+    // Buat URL API
+    const apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${encodeURIComponent(q)}&hl=${hl}&tbm=${tbm}`;
 
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "User-Agent": "Cloudflare-Worker"
+            }
+        });
+
+        if (!response.ok) {
+            return new Response(generateHTML("Terjadi kesalahan dalam pencarian.", q), {
+                headers: { "Content-Type": "text/html" }
+            });
+        }
+
         const results = await response.json();
 
         return new Response(generateHTML(results, q), {
-            headers: { "Content-Type": "text/html" } // ✅ Memastikan HTML dikembalikan
+            headers: { "Content-Type": "text/html" }
         });
+
     } catch (error) {
-        return new Response(generateHTML("Terjadi kesalahan dalam pencarian.", q), {
+        return new Response(generateHTML("Gagal mengambil data dari API.", q), {
             headers: { "Content-Type": "text/html" }
         });
     }
 }
 
-// Fungsi untuk membuat HTML secara dinamis
+// Fungsi untuk membuat HTML berdasarkan hasil pencarian
 function generateHTML(results = null, query = "") {
-    const title = query ? `${query} - Pencarian` : "Halaman Pencarian";
-    
+    const title = query ? `${query} - Pencarian` : "Mesin Pencarian";
+
     return `
     <!DOCTYPE html>
     <html lang="id">
@@ -66,6 +74,7 @@ function generateHTML(results = null, query = "") {
             button { padding: 10px; cursor: pointer; }
             .results { margin-top: 20px; }
             .result-item { margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+            .thumbnail { width: 100px; height: auto; display: block; margin-top: 5px; }
         </style>
     </head>
     <body>
@@ -76,7 +85,7 @@ function generateHTML(results = null, query = "") {
                 <button type="submit">Cari</button>
             </form>
 
-            ${results ? renderResults(results) : ""}
+            ${results ? renderResults(results) : "<p>Silakan masukkan kata kunci untuk mencari.</p>"}
         </div>
     </body>
     </html>
@@ -96,8 +105,9 @@ function renderResults(results) {
                 <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
                 <p>${item.snippet}</p>
                 <small>${item.displayLink}</small>
+                ${item.pagemap?.cse_thumbnail?.[0]?.src ? `<img class="thumbnail" src="${item.pagemap.cse_thumbnail[0].src}" alt="Thumbnail">` : ""}
             </div>
         `).join('')}
     </div>
     `;
-}
+        }
