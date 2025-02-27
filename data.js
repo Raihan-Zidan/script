@@ -209,7 +209,7 @@ class InsertInstantAnswer {
 async function modifyResponse(response, selector, content, index) {
 
   
-  const responseText = response.text(); // Ambil teks HTML dari Response
+  const responseText = response; // Ambil teks HTML dari Response
 
   const modifiedResponse = new Response(responseText, { 
     headers: { "Content-Type": "text/html" } 
