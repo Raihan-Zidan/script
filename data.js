@@ -55,7 +55,7 @@ async function handleRequest(request) {
         headers: { 'Content-Type': 'text/html' }
       })
     } catch (error) {
-      return new Response('Failed to fetch search results', {
+      return new Response(`Failed to fetch search results ${error} ${error.status} ${error.message}`, {
         headers: { 'Content-Type': 'text/html' },
         status: 500
       })
