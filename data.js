@@ -18,7 +18,7 @@ async function searchindex(request) {
     const query = url.searchParams.get('q') // Ambil parameter 'q' dari URL
     const tbm = url.searchParams.get('tbm') || '' // Ambil parameter 'tbm' dari URL (opsional)
     const hl = url.searchParams.get("hl")
-    consy gl = url.searchParams.get("gl")
+    const gl = url.searchParams.get("gl")
 
     if (!query) {
       return new Response('Query parameter "q" is required', {
