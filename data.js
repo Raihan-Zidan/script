@@ -15,10 +15,10 @@ export default {
 async function searchindex(request) {
   const url = new URL(request.url)
 
-  // Jika pathname adalah /search, tampilkan hasil pencarian
-  if (url.pathname === '/search') {
     const query = url.searchParams.get('q') // Ambil parameter 'q' dari URL
     const tbm = url.searchParams.get('tbm') || '' // Ambil parameter 'tbm' dari URL (opsional)
+    const hl = url.searchParams.get("hl")
+    consy gl = url.searchParams.get("gl")
 
     if (!query) {
       return new Response('Query parameter "q" is required', {
@@ -27,11 +27,54 @@ async function searchindex(request) {
       })
     }
 
-    // Pastikan URL API benar dan parameter di-encode dengan benar
-    const apiUrl = `https://www.googleapis.com/customsearch/v1?key=AIzaSyD4KHQg1v9wFVlaKEVVVlZpiq8Y8L4UouI&start=0&cx=435bdb05f0b5e47bb&q=${query}`
+    const apikey = [
+      "AIzaSyCJ3RgcZOxOm_V1hq-UXCJwPsWquHggQrg",
+      "AIzaSyDuBTV5q0NAgfSY-2X9h5-ggbrX-a3EJBU",
+      "AIzaSyB7eZUGjFCrSPEEI9OlDmtRW5fRTQIKIus",
+      "AIzaSyC1etlk90G0YK1pNmblThRrIpYXWVCe8no",
+      "AIzaSyAeibL6090vetveJ2IxkZ0h8JpmCUAEFAU",
+      "AIzaSyBOETA8ym9-I5zMAq7IoEhQ1p4PajPvzHk",
+      "AIzaSyBeCeoUn9efByemCErnTfNOW85H6WhUU8Q",
+      "AIzaSyDJAlDofWRoODKtvr4gtDkHYNAHPZzSVX0",
+      "AIzaSyDYZQDK3--oAlN9P80kFbr5Ae81Xv4r4Ew",
+      "AIzaSyDBficXMaK97bS7ys4mAGvz5tLwwBSKbbg",
+      "AIzaSyBK7tP0QHWR0x4YUd71sN298A4raMfLqKY",
+      "AIzaSyD4KHQg1v9wFVlaKEVVVlZpiq8Y8L4UouI",
+      "AIzaSyBj7aEZNIwRQG2cjuHZyPfW1UNywqsMcNo",
+      "AIzaSyCmS3naxRClDgCH_ugTbn6dSqtArX0xj2o",
+      "AIzaSyBtnDuoWCx30xG2gmUgRdB_pqGUzdr7s-A",
+      "AIzaSyD69KZdQRASdg0QxpOA74adD4HeFRgHwx8",
+      "AIzaSyDKPUq-VyTWsEA6PTozWnMEwNes3fu3CSY",
+      "AIzaSyA-ZFRhlpU4PBS10Kp5Ipp6UD4xK--M-j8",
+      "AIzaSyBni04n3gqNYKqAvtzNSWhau9LOoNzRFj4",
+      "AIzaSyAB3o1QppoePI655jiTC3ArSBfQs_SuGyw",
+      "AIzaSyAIyON_dQEybmn0HVilGHnPG2Hz0kheatk",
+      "AIzaSyBIWWb7muhPm7yo4QPq1vcqi4XWaNtIJOY",
+      "AIzaSyBm9AN4slsELMKW8fL401ZNC6ahIzWHjuc",
+      "AIzaSyA8uJOYnA1ohf_7qIKJ15Evpyldq3CVl9M",
+      "AIzaSyDgDhEyznphPnYHWQzIqiVJfkgwrxo2-2A"
+    ];
+    const ytapikey = [
+      "AIzaSyDl_e_6hP6mKPXmzXbahlduZG3ErglkHSY",
+      "AIzaSyAqc7T67GDJ208Y8CvR8YaPrNZlzKa2XbE"
+    ];
+
+    let googleSearchURL;
+    if (tbm === "vid") {
+      const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
+      googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
+      if (maxResults) googleSearchURL += `&maxResults=${maxResults}`;
+    } else {
+      const googleAPIKey = apikey[Math.floor(Math.random() * apikey.length)];
+      const googleCX = tbm === "nws" ? "f7113f6d71c8f48c8" : "435bdb05f0b5e47bb";
+      googleSearchURL = `https://www.googleapis.com/customsearch/v1?key=${googleAPIKey}&cx=${googleCX}&q=${encodeURIComponent(query)}&start=${startIndex}`;
+      
+      if (gl) googleSearchURL += `&gl=${gl}`;
+      if (hl) googleSearchURL += `&hl=${hl}`;
+    }
 
     try {
-      const response = await fetch(apiUrl)
+      const response = await fetch(googleSearchURL)
 
       // Periksa apakah respons dari API valid
       if (!response.ok) {
@@ -109,7 +152,7 @@ async function searchindex(request) {
         status: 500
       })
     }
-  }
+  
 
   // Jika pathname bukan /search, tampilkan halaman pencarian sederhana
 
