@@ -1,0 +1,4 @@
+name = "script"
+main = "data.js"
+
+compatibility_date = "2025-02-16"
