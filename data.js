@@ -7,8 +7,8 @@ async function handleRequest(request) {
 
   // Jika pathname adalah /search, tampilkan hasil pencarian
   if (url.pathname === '/search') {
-    const query = url.searchParams.get('q')
-    const tbm = url.searchParams.get('tbm') || ''
+    const query = url.searchParams.get('q') // Ambil parameter 'q' dari URL
+    const tbm = url.searchParams.get('tbm') || '' // Ambil parameter 'tbm' dari URL (opsional)
 
     if (!query) {
       return new Response('Query parameter "q" is required', {
@@ -30,7 +30,7 @@ async function handleRequest(request) {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Search Results for "${query}"</title>
+          <title>Search Results for ${query}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             .result { margin-bottom: 20px; }
@@ -79,7 +79,7 @@ async function handleRequest(request) {
       </style>
     </head>
     <body>
-      <h1>My Search Engine</h1>
+      <h1>Search Engine</h1>
       <form action="/search" method="GET">
         <input type="text" name="q" placeholder="Enter your search query" required>
         <input type="text" name="tbm" placeholder="Search type (optional)">
