@@ -75,7 +75,7 @@ async function searchindex(request) {
   <div class="VtuHV Kj7VF tab-result eb8xCva"><div class="tab-link"  data-number=""><a href="${item.link}"><div class="top"><div class="favicon"><img src="https://datasearch.raihan-zidan2709.workers.dev/favicon?url=${item.link}"></div><div class="link-rw"><div class="link"></div><div class="link k">https://${item.displayLink}</div></div></div><div class="title">${item.title}</div></a></div><div class="btm-snpt"><div class="snippet">${item.snippet}</div></div></div>
   
           `).join('')}
-      `)
+      `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
       return new HTMLRewriter()
@@ -134,7 +134,7 @@ function mainpage(request) {
     <body>
       <h1>My Search Engine</h1>
       <form action="/search" method="GET">
-        <input type="text" name="q" placeholder="Enter your search query" required>
+        <input type="search" name="q" placeholder="Enter your search query" required>
         <input type="text" name="tbm" placeholder="Search type (optional)">
         <button type="submit">Search</button>
       </form>
@@ -147,7 +147,7 @@ function mainpage(request) {
   })
 }
 
-function sethtml(html) {
+function sethtml(html, query) {
   return `
           <!DOCTYPE html>
         <html lang="en">
