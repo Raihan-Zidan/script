@@ -66,15 +66,11 @@ async function handleRequest(request) {
         </body>
         </html>
       `
-      if (tbm == "vid") {
-      document.querySelectorAll(".search-item")[2].classList.add("selected");
-      } else if (tbm == "isch") {
-        document.querySelectorAll(".search-item")[1].classList.add("selected");
-      } else if (tbm == "nws") {
-        document.querySelectorAll(".search-item")[3].classList.add("selected");
-      } else {
-        document.querySelectorAll(".search-item")[0].classList.add("selected");
-      }
+
+  return new HTMLRewriter()
+    .on(".search-item", new SearchItemHandler(tbm))
+    .transform(response);
+
       return new Response(htmlResponse, {
         headers: { 'Content-Type': 'text/html' }
       })
@@ -137,4 +133,28 @@ async function handleRequest(request) {
   return new Response(htmlForm, {
     headers: { 'Content-Type': 'text/html' }
   })
+}
+
+class SearchItemHandler {
+  constructor(tbm) {
+    this.tbm = tbm;
+    this.index = 0;
+  }
+
+  element(element) {
+    // Tentukan elemen mana yang harus dipilih berdasarkan tbm
+    const selectedIndex = this.getSelectedIndex();
+    if (this.index === selectedIndex) {
+      element.classList.add("selected");
+    }
+    this.index++;
+  }
+
+  getSelectedIndex() {
+    if (this.tbm === "vid") return 2;
+    if (this.tbm === "isch") return 1;
+    if (this.tbm === "nws") return
+ 3;
+    return 0; // Default
+  }
 }
