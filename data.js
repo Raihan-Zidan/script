@@ -18,7 +18,7 @@ async function handleRequest(request) {
     }
 
     // Pastikan URL API benar dan parameter di-encode dengan benar
-    const apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${encodeURIComponent(query)}&tbm=${encodeURIComponent(tbm)}`
+    const apiUrl = `https://www.googleapis.com/customsearch/v1?key=AIzaSyD4KHQg1v9wFVlaKEVVVlZpiq8Y8L4UouI&start=0&cx=435bdb05f0b5e47bb&q=${query}`
 
     try {
       const response = await fetch(apiUrl)
