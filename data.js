@@ -69,7 +69,7 @@ async function handleRequest(request) {
 
   return new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
-    .transform(response);
+    .transform(htmlResponse);
 
       return new Response(htmlResponse, {
         headers: { 'Content-Type': 'text/html' }
