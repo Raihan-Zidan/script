@@ -1,77 +1,95 @@
-const GITHUB_REPO = "Raihan-Zidan/script";
-const FILE_PATH = "data.json";
-const SITE_TO_CRAWL = "https://kompas.com";
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
 
-// Fungsi untuk mengambil HTML dari website
-async function crawlWebsite() {
-  const response = await fetch(SITE_TO_CRAWL);
-  const html = await response.text();
+async function handleRequest(request) {
+  const url = new URL(request.url)
 
-  // Ekstrak link dari halaman
-  const links = [...html.matchAll(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/g)].map(m => m[1]);
+  // Jika pathname adalah /search, tampilkan hasil pencarian
+  if (url.pathname === '/search') {
+    const query = url.searchParams.get('q')
+    const tbm = url.searchParams.get('tbm') || ''
 
-  return { timestamp: new Date().toISOString(), links };
-}
-
-// Fungsi untuk mendapatkan SHA dari file di GitHub
-async function getCurrentSHA(env) {
-  try {
-    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`, {
-      headers: { Authorization: `token ${env.GITHUB_TOKEN}`, Accept: "application/vnd.github.v3+json" },
-    });
-
-    if (response.status === 404) {
-      console.log("File belum ada, membuat baru...");
-      return null; // Jika file belum ada, tidak perlu sha
+    if (!query) {
+      return new Response('Query parameter "q" is required', {
+        headers: { 'Content-Type': 'text/html' },
+        status: 400
+      })
     }
 
-    const json = await response.json();
-    return json.sha;
-  } catch (error) {
-    console.error("Error mendapatkan SHA:", error);
-    return null;
+    const apiUrl = `https://datasearch.raihan-zidan2709.workers.dev/api?q=${encodeURIComponent(query)}&tbm=${encodeURIComponent(tbm)}`
+
+    try {
+      const response = await fetch(apiUrl)
+      const data = await response.json()
+
+      // Membuat HTML untuk menampilkan hasil pencarian
+      const htmlResponse = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Search Results for "${query}"</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .result { margin-bottom: 20px; }
+            .title { font-size: 18px; font-weight: bold; }
+            .link { color: #1a0dab; text-decoration: none; }
+            .snippet { color: #4d5156; }
+          </style>
+        </head>
+        <body>
+          <h1>Search Results for "${query}"</h1>
+          ${data.results.map(result => `
+            <div class="result">
+              <div class="title"><a href="${result.link}" class="link">${result.title}</a></div>
+              <div class="snippet">${result.snippet}</div>
+            </div>
+          `).join('')}
+        </body>
+        </html>
+      `
+
+      return new Response(htmlResponse, {
+        headers: { 'Content-Type': 'text/html' }
+      })
+    } catch (error) {
+      return new Response('Failed to fetch search results', {
+        headers: { 'Content-Type': 'text/html' },
+        status: 500
+      })
+    }
   }
+
+  // Jika pathname bukan /search, tampilkan halaman pencarian sederhana
+  const htmlForm = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Search Engine</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        form { display: flex; flex-direction: column; max-width: 400px; margin: 0 auto; }
+        input { margin-bottom: 10px; padding: 10px; font-size: 16px; }
+        button { padding: 10px; font-size: 16px; background-color: #1a0dab; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0b5ed7; }
+      </style>
+    </head>
+    <body>
+      <h1>My Search Engine</h1>
+      <form action="/search" method="GET">
+        <input type="text" name="q" placeholder="Enter your search query" required>
+        <input type="text" name="tbm" placeholder="Search type (optional)">
+        <button type="submit">Search</button>
+      </form>
+    </body>
+    </html>
+  `
+
+  return new Response(htmlForm, {
+    headers: { 'Content-Type': 'text/html' }
+  })
 }
-
-// Fungsi untuk memperbarui file di GitHub
-async function updateGitHub(data, env) {
-  try {
-    const content = JSON.stringify(data, null, 2);
-    const encodedContent = btoa(unescape(encodeURIComponent(content)));
-    const sha = await getCurrentSHA(env); // Ambil SHA sebelum update
-
-    // Commit perubahan ke GitHub
-    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${FILE_PATH}`, {
-      method: "PUT",
-      headers: { Authorization: `token ${env.GITHUB_TOKEN}`, Accept: "application/vnd.github.v3+json" },
-      body: JSON.stringify({
-        message: `Update data ${new Date().toISOString()}`,
-        content: encodedContent,
-        sha: sha || undefined, // Jika file belum ada, sha tidak dikirim
-      }),
-    });
-
-    const json = await response.json();
-    console.log("GitHub Update Response:", json);
-  } catch (error) {
-    console.error("Error mengupdate GitHub:", error);
-  }
-}
-
-// Menangani permintaan HTTP
-export default {
-  async fetch(request, env) {
-    console.log("Fetch request diterima");
-    const data = await crawlWebsite();
-    await updateGitHub(data, env);
-    return new Response(JSON.stringify({ status: "success", data }), { headers: { "Content-Type": "application/json" } });
-  },
-
-  // Menangani event schedule dari Cloudflare Cron Triggers
-  async scheduled(event, env) {
-    console.log("Worker berjalan sesuai jadwal:", event.cron);
-    const data = await crawlWebsite();
-    await updateGitHub(data, env);
-  },
-};
-      
