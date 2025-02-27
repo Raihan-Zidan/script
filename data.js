@@ -23,6 +23,8 @@ async function handleSearch(request) {
             headers: { "Content-Type": "text/html" }
         });
     }
+    const d = q || "";
+    const judul = q ? `${q} - Pencarian` : "";
 
     let apiUrl;
     if (tbm === "vid") {
@@ -38,11 +40,11 @@ async function handleSearch(request) {
         const results = await response.json();
 
         return new Response(generateHTML(results, q), {
-            headers: { "Content-Type": "text/html" }
+            headers: { "Content-Type": "text/json" }
         });
     } catch (error) {
         return new Response(generateHTML("Terjadi kesalahan dalam pencarian."), {
-            headers: { "Content-Type": "text/html" }
+            headers: { "Content-Type": "text/json" }
         });
     }
 }
@@ -55,7 +57,7 @@ function generateHTML(results = null, query = "") {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${query ? `${query} - Pencarian` : "Halaman Pencarian"}</title>
+        <title>${judul}</title>
         <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             .container { max-width: 600px; margin: 0 auto; }
@@ -70,7 +72,7 @@ function generateHTML(results = null, query = "") {
         <div class="container">
             <h1>Pencarian</h1>
             <form action="/search" method="GET" class="search-box">
-                <input type="text" name="q" placeholder="Cari sesuatu..." value="${query}">
+                <input type="text" name="q" value="${d}" placeholder="Cari sesuatu..." value="${query}">
                 <button type="submit">Cari</button>
             </form>
 
