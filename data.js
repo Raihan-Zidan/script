@@ -77,7 +77,8 @@ async function searchindex(request) {
           `).join('')}
       `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
-  return new HTMLRewriter()
+      const haha = await modifyResponse(responseClone, ".tab-result", `<div class="instant-answer"></div>`, 2);
+  new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(responseClone);
       
