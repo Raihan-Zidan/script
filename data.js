@@ -1,8 +1,18 @@
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+export default {
+  async fetch(request) {
 
-async function handleRequest(request) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    if (path.startsWith("/search")) {
+      return await searchindex(request);
+    } else {
+      return mainpage(request);
+    }
+  },
+};
+
+async function searchindex(request) {
   const url = new URL(request.url)
 
   // Jika pathname adalah /search, tampilkan hasil pencarian
@@ -102,6 +112,10 @@ async function handleRequest(request) {
   }
 
   // Jika pathname bukan /search, tampilkan halaman pencarian sederhana
+
+}
+
+function mainpage(request) {
   const htmlForm = `
     <!DOCTYPE html>
     <html lang="en">
