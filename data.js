@@ -81,11 +81,12 @@ async function searchindex(request) {
           `).join('')}
       `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
-      const haha = await modifyResponse(htmlResponse, ".tab-result", `<div class="instant-answer"></div>`, 2)
-  return new HTMLRewriter()
+   
+  const tb = new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(haha);
-      
+
+      const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${res.title}</div><div class="about"><span class="snippet">${res.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${res.sourceUrl}" class="wikipedia" title="Wikipedia">${res.source}</a></div><div class="infobox"></div>`, 2)
       return new Response(haha, {
         headers: { 'Content-Type': 'text/html' }
       })
