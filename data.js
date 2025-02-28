@@ -79,15 +79,16 @@ async function searchindex(request) {
   
           `).join('')}
       `, query)
-            const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
-   
-  new HTMLRewriter()
-    .on(".search-item", new SearchItemHandler(tbm))
-    .transform(responseClone);
-      await instant(query);
-      return new Response(responseClone, {
-        headers: { 'Content-Type': 'text/html' }
-      })
+const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
+
+const transformedResponse = new HTMLRewriter()
+  .on(".search-item", new SearchItemHandler(tbm))
+  .transform(responseClone);
+
+await instant(query);
+
+return transformedResponse; // Langsung return response hasil transformasi
+
       
     } catch (error) {
       // Tangani error dan tampilkan pesan error di halaman HTML
