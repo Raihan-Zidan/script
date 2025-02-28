@@ -248,10 +248,6 @@ async function modifyResponse(response, selector, content, index) {
 }
 
 
-  return new HTMLRewriter()
-    .on(selector, new InsertInstantAnswer(content, index))
-    .transform(modifiedResponse);
-}
 
 async function handleRequest(response, tbm) {
   // Pastikan response tidak digunakan lebih dari sekali tanpa clone
