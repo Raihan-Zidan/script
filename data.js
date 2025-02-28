@@ -86,22 +86,9 @@ let transformedResponse = new HTMLRewriter()
   .transform(responseClone);
 
 // Tunggu hasil dari instant() sebelum melanjutkan
-await instant(query);
+transformedResponse = await instant(query, transformedResponse);
 
-// Jika `instant()` berhasil mendapatkan hasil, modifikasi response
-if (hasil?.judul) {
-  transformedResponse = await modifyResponse(
-    transformedResponse,
-    ".tab-result",
-    `<div class="title">${hasil.title}</div>
-     <div class="about">
-       <span class="snippet">${hasil.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span>
-       <a href="${hasil.sourceUrl}" class="wikipedia" title="Wikipedia">${hasil.source}</a>
-     </div>
-     <div class="infobox"></div>`,
-    2
-  );
-}
+
 
 return transformedResponse;
           
@@ -139,7 +126,8 @@ return transformedResponse;
 
 
 
-async function instant(query) {
+async function instant(query, transformedResponse) {
+  const tb = transformedResponse;
   const instantansw = await fetch(
         `https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`
       );
