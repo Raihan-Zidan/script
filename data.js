@@ -84,7 +84,7 @@ async function searchindex(request) {
   const tb = new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(responseClone);
-      instant(query);
+      await instant(query);
       return new Response(tb, {
         headers: { 'Content-Type': 'text/html' }
       })
@@ -122,7 +122,7 @@ async function searchindex(request) {
 
 
 
-function instant(query) {
+async function instant(query) {
   const instantansw = await fetch(
         `https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`
       );
