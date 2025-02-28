@@ -37,7 +37,7 @@ async function searchindex(request) {
       googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
       
     } else if (tbm === "isch") {
-      googleSearchUrl = `https://imagesearch.raihan-zidan2709.workers.dev/images?q=${encodeURIComponent(query)}`;
+      googleSearchURL = `https://imagesearch.raihan-zidan2709.workers.dev/images?q=${encodeURIComponent(query)}`;
     } else {
       const googleAPIKey = apikey[Math.floor(Math.random() * apikey.length)];
       const googleCX = tbm === "nws" ? "f7113f6d71c8f48c8" : "435bdb05f0b5e47bb";
