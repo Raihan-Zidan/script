@@ -44,7 +44,7 @@ async function searchindex(request) {
       if (gl) googleSearchURL += `&gl=${gl}`;
       if (hl) googleSearchURL += `&hl=${hl}`;
       if (tbm != "nws") {
-        instantansw = await fetch(`https://datasearch.raihan-zidan2709.workers.dev/?q=${q}`)
+        instantansw = await fetch(`https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`)
       }
     }
 
