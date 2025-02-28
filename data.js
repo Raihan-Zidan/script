@@ -81,11 +81,11 @@ async function searchindex(request) {
       `, query)
             const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
    
-  const tb = new HTMLRewriter()
+  new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(responseClone);
       await instant(query);
-      return new Response(tb, {
+      return new Response(responseClone, {
         headers: { 'Content-Type': 'text/html' }
       })
       
