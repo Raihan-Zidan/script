@@ -32,6 +32,7 @@ async function searchindex(request) {
 
     let googleSearchURL;
     let instantansw;
+    let hasil = await instantansw.json();
     if (tbm === "vid") {
       const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
       googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
@@ -86,7 +87,7 @@ async function searchindex(request) {
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(responseClone);
 
-      const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${res.title}</div><div class="about"><span class="snippet">${res.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${res.sourceUrl}" class="wikipedia" title="Wikipedia">${res.source}</a></div><div class="infobox"></div>`, 2)
+      const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${hasil.title}</div><div class="about"><span class="snippet">${hasil.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${hasil.sourceUrl}" class="wikipedia" title="Wikipedia">${hasil.source}</a></div><div class="infobox"></div>`, 2)
       return new Response(haha, {
         headers: { 'Content-Type': 'text/html' }
       })
