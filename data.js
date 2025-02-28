@@ -99,7 +99,7 @@ htmlResponse = sethtml(`
 `, query);
 
 } else if (tbm === "isch") {
-   htmlResponse = sethtml(data, query)
+   htmlResponse = sethtml(data.images, query)
 
 } else if (tbm != "isch" && tbm != "vid") {
    htmlResponse = sethtml(`
