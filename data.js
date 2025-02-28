@@ -81,14 +81,30 @@ async function searchindex(request) {
       `, query)
 const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
-const transformedResponse = new HTMLRewriter()
+let transformedResponse = new HTMLRewriter()
   .on(".search-item", new SearchItemHandler(tbm))
   .transform(responseClone);
 
+// Tunggu hasil dari instant() sebelum melanjutkan
 await instant(query);
 
-return transformedResponse; // Langsung return response hasil transformasi
+// Jika `instant()` berhasil mendapatkan hasil, modifikasi response
+if (hasil?.judul) {
+  transformedResponse = await modifyResponse(
+    transformedResponse,
+    ".tab-result",
+    `<div class="title">${hasil.title}</div>
+     <div class="about">
+       <span class="snippet">${hasil.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span>
+       <a href="${hasil.sourceUrl}" class="wikipedia" title="Wikipedia">${hasil.source}</a>
+     </div>
+     <div class="infobox"></div>`,
+    2
+  );
+}
 
+return transformedResponse;
+          
       
     } catch (error) {
       // Tangani error dan tampilkan pesan error di halaman HTML
@@ -226,13 +242,11 @@ class InsertInstantAnswer {
 }
 
 async function modifyResponse(response, selector, content, index) {
+  return new HTMLRewriter()
+    .on(selector, new InsertInstantAnswer(content, index))
+    .transform(response);
+}
 
-  
-  const responseText = response; // Ambil teks HTML dari Response
-
-  const modifiedResponse = new Response(responseText, { 
-    headers: { "Content-Type": "text/html" } 
-  });
 
   return new HTMLRewriter()
     .on(selector, new InsertInstantAnswer(content, index))
