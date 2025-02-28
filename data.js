@@ -84,7 +84,7 @@ async function searchindex(request) {
    
   const tb = new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
-    .transform(htmlResponse);
+    .transform(responseClone);
 
       const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${res.title}</div><div class="about"><span class="snippet">${res.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${res.sourceUrl}" class="wikipedia" title="Wikipedia">${res.source}</a></div><div class="infobox"></div>`, 2)
       return new Response(haha, {
