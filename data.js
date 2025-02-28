@@ -31,6 +31,7 @@ async function searchindex(request) {
     ytapikey=["AIzaSyDl_e_6hP6mKPXmzXbahlduZG3ErglkHSY","AIzaSyAqc7T67GDJ208Y8CvR8YaPrNZlzKa2XbE"];
 
     let googleSearchURL;
+    let instantansw;
     if (tbm === "vid") {
       const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
       googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
@@ -42,6 +43,9 @@ async function searchindex(request) {
       
       if (gl) googleSearchURL += `&gl=${gl}`;
       if (hl) googleSearchURL += `&hl=${hl}`;
+      if (tbm != "nws") {
+        instantansw = await fetch(`https://datasearch.raihan-zidan2709.workers.dev/?q=${q}`)
+      }
     }
 
     try {
