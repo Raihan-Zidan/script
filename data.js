@@ -36,7 +36,7 @@ async function searchindex(request) {
       const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
       googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
       
-    } else if (tbm === "isc") {
+    } else if (tbm === "isch") {
       googleSearchUrl = `https://imagesearch.raihan-zidan2709.workers.dev/images?q=${encodeURIComponent(query)}`
     } else {
       const googleAPIKey = apikey[Math.floor(Math.random() * apikey.length)];
