@@ -90,7 +90,7 @@ if (tbm == "nws") {
        </div>
    `).join('')}
    `, query); // Menutup sethtm
-l dengan benar
+
 } else if (tbm != "isch" && tbm != "vid") {
    htmlResponse = sethtml(`
        ${data.items.map(item => `
