@@ -117,7 +117,6 @@ if (tbm == "nws") {
          </div>
        `).join('')}
    `, query); // Menut
-up sethtml dengan benar
                }
       
 const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
