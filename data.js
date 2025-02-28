@@ -99,23 +99,7 @@ htmlResponse = sethtml(`
 `, query);
 
 } else if (tbm === "isch") {
-   htmlResponse = sethtml(`
-      ${data.images.map(item => `
-      <div class="img-th">
-                    <div class="img-dt">
-                        <div class="img-thumb" style="">
-                        </div>
-                        <a class="info" href="${item.pageUrl}">
-                            <p class="title" name="t">${item.title}</p>
-                            <p class="i-desc">
-                              <img data-src="" src="https://datasearch.raihan-zidan2709.workers.dev/favicon?url=${item.pageUrl}">
-                              <span>${item.siteName}</span>
-                            </p>
-                        </a>
-                    </div>
-                </div>
-                `).join('')}
-                `, query)
+   htmlResponse = sethtml(data, query)
 
 } else if (tbm != "isch" && tbm != "vid") {
    htmlResponse = sethtml(`
