@@ -31,7 +31,6 @@ async function searchindex(request) {
     ytapikey=["AIzaSyDl_e_6hP6mKPXmzXbahlduZG3ErglkHSY","AIzaSyAqc7T67GDJ208Y8CvR8YaPrNZlzKa2XbE"];
 
     let googleSearchURL;
-    let instantansw;
     let hasil = {};
     if (tbm === "vid") {
       const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
@@ -44,17 +43,9 @@ async function searchindex(request) {
       
       if (gl) googleSearchURL += `&gl=${gl}`;
       if (hl) googleSearchURL += `&hl=${hl}`;
-          try {
-      instantansw = await fetch(
-        `https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`
-      );
-      if (instantansw.ok) {
-        hasil = await instantansw.json();
-      }
-    } catch (error) {
-      throw new Error("Instant answer API error:", error);
-          }
+   
     }
+}
 
     try {
       const response = await fetch(googleSearchURL)
@@ -93,10 +84,8 @@ async function searchindex(request) {
   const tb = new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(responseClone);
-      if (hasil.judul) {
-      const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${hasil.title}</div><div class="about"><span class="snippet">${hasil.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${hasil.sourceUrl}" class="wikipedia" title="Wikipedia">${hasil.source}</a></div><div class="infobox"></div>`, 2)
-      }
-      return new Response(haha, {
+      instant(query);
+      return new Response(tb, {
         headers: { 'Content-Type': 'text/html' }
       })
       
@@ -131,6 +120,21 @@ async function searchindex(request) {
 
   // Jika pathname bukan /search, tampilkan halaman pencarian sederhana
 
+}
+
+function instant(query) {
+  const instantansw = await fetch(
+        `https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`
+      );
+  let data;
+  try {
+    hasil = await instantansw.json()
+    if (hasil.judul) {
+      const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${hasil.title}</div><div class="about"><span class="snippet">${hasil.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${hasil.sourceUrl}" class="wikipedia" title="Wikipedia">${hasil.source}</a></div><div class="infobox"></div>`, 2)
+    }
+  } catch (error) {
+
+  }
 }
 
 function mainpage(request) {
