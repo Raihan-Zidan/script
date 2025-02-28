@@ -120,7 +120,7 @@ async function searchindex(request) {
 
   // Jika pathname bukan /search, tampilkan halaman pencarian sederhana
 
-}
+
 
 function instant(query) {
   const instantansw = await fetch(
