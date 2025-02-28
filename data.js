@@ -32,7 +32,7 @@ async function searchindex(request) {
 
     let googleSearchURL;
     let instantansw;
-    let hasil = await instantansw.json();
+    let hasil = {};
     if (tbm === "vid") {
       const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
       googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
@@ -44,9 +44,16 @@ async function searchindex(request) {
       
       if (gl) googleSearchURL += `&gl=${gl}`;
       if (hl) googleSearchURL += `&hl=${hl}`;
-      if (tbm != "nws") {
-        instantansw = await fetch(`https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`)
+          try {
+      instantansw = await fetch(
+        `https://datasearch.raihan-zidan2709.workers.dev/?q=${query}`
+      );
+      if (instantansw.ok) {
+        hasil = await instantansw.json();
       }
+    } catch (error) {
+      throw new Error("Instant answer API error:", error);
+          }
     }
 
     try {
@@ -86,8 +93,9 @@ async function searchindex(request) {
   const tb = new HTMLRewriter()
     .on(".search-item", new SearchItemHandler(tbm))
     .transform(responseClone);
-
+      if (hasil.judul) {
       const haha = await modifyResponse(tb, ".tab-result", `<div class="title">${hasil.title}</div><div class="about"><span class="snippet">${hasil.snippet.replace(/\<\/?pre.*?\/?\>/g, "").replace(/\<\/?code.*?\/?\>/g, "").slice(0, 220)}... </span><a href="${hasil.sourceUrl}" class="wikipedia" title="Wikipedia">${hasil.source}</a></div><div class="infobox"></div>`, 2)
+      }
       return new Response(haha, {
         headers: { 'Content-Type': 'text/html' }
       })
