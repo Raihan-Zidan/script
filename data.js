@@ -36,6 +36,8 @@ async function searchindex(request) {
       const YtAPIKey = ytapikey[Math.floor(Math.random() * ytapikey.length)];
       googleSearchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YtAPIKey}`;
       
+    } else if (tbm === "isc") {
+      googleSearchUrl = `https://imagesearch.raihan-zidan2709.workers.dev/images?q=${encodeURIComponent(query)}`
     } else {
       const googleAPIKey = apikey[Math.floor(Math.random() * apikey.length)];
       const googleCX = tbm === "nws" ? "f7113f6d71c8f48c8" : "435bdb05f0b5e47bb";
@@ -73,7 +75,7 @@ async function searchindex(request) {
       // Membuat HTML untuk menampilkan hasil pencarian
       const q = query;
 let htmlResponse;
-if (tbm == "nws") {
+if (tbm === "nws") {
 htmlResponse = sethtml(`
    ${data.items.map(item => {
      const thumbimg = (item?.pagemap?.cse_thumbnail) 
@@ -96,6 +98,8 @@ htmlResponse = sethtml(`
    }).join('')}
 `, query);
 
+} else if (tbm === "isch") {
+  
 } else if (tbm != "isch" && tbm != "vid") {
    htmlResponse = sethtml(`
        ${data.items.map(item => `
