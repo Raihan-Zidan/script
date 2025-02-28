@@ -75,14 +75,16 @@ async function searchindex(request) {
 let htmlResponse;
 if (tbm == "nws") {
    htmlResponse = sethtml(`
-   ${data.items.map(item => `
+   ${data.items.map(item => 
+     const thumbimg = (item?.pagemap?.cse_thumbnail) ? `<img class="thumb" src="${item.pagemap.cse_thumbnail[0].src}">` : "";
+     `
        <div class="tab-result nwst">
          <div class="snwt">
            <a href="${item.link}">
              <div class="top">
                <img src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${item.link}&size=64" class="favicon">
                <div class="link">${item?.pagemap?.metatags?.[0]?.['og:site_name'] ?? item.displayLink}</div>
-             </div>
+             </div>${thumbimg}
              <div class="title">${item.title.slice(0, 70)}</div>
              <div class="publishtime"></div>
            </a>
