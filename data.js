@@ -74,10 +74,12 @@ async function searchindex(request) {
       const q = query;
 let htmlResponse;
 if (tbm == "nws") {
-   htmlResponse = sethtml(`
-   ${data.items.map(item => 
-     const thumbimg = (item?.pagemap?.cse_thumbnail) ? `<img class="thumb" src="${item.pagemap.cse_thumbnail[0].src}">` : "";
-     `
+htmlResponse = sethtml(`
+   ${data.items.map(item => {
+     const thumbimg = (item?.pagemap?.cse_thumbnail) 
+       ? `<img class="thumb" src="${item.pagemap.cse_thumbnail[0].src}">` 
+       : "";
+     return `
        <div class="tab-result nwst">
          <div class="snwt">
            <a href="${item.link}">
@@ -90,8 +92,9 @@ if (tbm == "nws") {
            </a>
          </div>
        </div>
-   `).join('')}
-   `, query); // Menutup sethtm
+     `;
+   }).join('')}
+`, query);
 
 } else if (tbm != "isch" && tbm != "vid") {
    htmlResponse = sethtml(`
