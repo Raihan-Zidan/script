@@ -85,8 +85,6 @@ let transformedResponse = new HTMLRewriter()
   .on(".search-item", new SearchItemHandler(tbm))
   .transform(responseClone);
 
-// Tunggu hasil dari instant() sebelum melanjutkan
-transformedResponse = await instant(query, transformedResponse);
 
 
 
