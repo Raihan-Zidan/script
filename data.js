@@ -100,7 +100,7 @@ htmlResponse = sethtml(`
 
 } else if (tbm === "isch") {
    htmlResponse = sethtml(`
-      ${res.images.map(item => `
+      ${data.images.map(item => `
       <div class="img-th">
                     <div class="img-dt">
                         <div class="img-thumb" style="">
