@@ -81,7 +81,7 @@ if (tbm == "nws") {
            <a href="${item.link}">
              <div class="top">
                <img src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${item.link}&size=64" class="favicon">
-               <div class="link"></div>
+               <div class="link">${item?.pagemap?.metatags?.[0]?.['og:site_name'] ?? item.displayLink}</div>
              </div>
              <div class="title">${item.title.slice(0, 70)}</div>
              <div class="publishtime"></div>
