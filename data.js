@@ -99,7 +99,7 @@ htmlResponse = sethtml(`
 `, query);
 
 } else if (tbm === "isch") {
-   htmlResponse = sethtml(data.error, query)
+   htmlResponse = sethtml(JSON.stringify(data), query)
 
 } else if (tbm != "isch" && tbm != "vid") {
    htmlResponse = sethtml(`
