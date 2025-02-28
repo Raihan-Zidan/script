@@ -45,7 +45,7 @@ async function searchindex(request) {
       if (hl) googleSearchURL += `&hl=${hl}`;
    
     }
-}
+
 
     try {
       const response = await fetch(googleSearchURL)
@@ -116,7 +116,7 @@ async function searchindex(request) {
         status: 500
       })
     }
-  
+}
 
   // Jika pathname bukan /search, tampilkan halaman pencarian sederhana
 
