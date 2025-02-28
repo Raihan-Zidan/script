@@ -72,13 +72,54 @@ async function searchindex(request) {
 
       // Membuat HTML untuk menampilkan hasil pencarian
       const q = query;
-      const htmlResponse = sethtml(`
-
-          ${data.items.map(item => `
-  <div class="VtuHV Kj7VF tab-result eb8xCva"><div class="tab-link"  data-number=""><a href="${item.link}"><div class="top"><div class="favicon"><img src="https://datasearch.raihan-zidan2709.workers.dev/favicon?url=${item.displayLink}"></div><div class="link-rw"><div class="link">${item?.pagemap?.metatags?.[0]?.['og:site_name'] ?? item.displayLink}</div><div class="link k">https://${item.displayLink}</div></div></div><div class="title">${item.title}</div></a></div><div class="btm-snpt"><div class="snippet">${item.snippet}</div></div></div>
-  
-          `).join('')}
-      `, query)
+let htmlResponse;
+if (tbm == "nws") {
+   htmlResponse = sethtml(`
+   ${data.items.map(item => `
+       <div class="tab-result nwst">
+         <div class="snwt">
+           <a href="${item.link}">
+             <div class="top">
+               <img src="https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${item.link}&size=64" class="favicon">
+               <div class="link"></div>
+             </div>
+             <div class="title">${item.title.slice(0, 70)}</div>
+             <div class="publishtime"></div>
+           </a>
+         </div>
+       </div>
+   `).join('')}
+   `, query); // Menutup sethtm
+l dengan benar
+} else if (tbm != "isch" && tbm != "vid") {
+   htmlResponse = sethtml(`
+       ${data.items.map(item => `
+         <div class="VtuHV Kj7VF tab-result eb8xCva">
+           <div class="tab-link" data-number="">
+             <a href="${item.link}">
+               <div class="top">
+                 <div class="favicon">
+                   <img src="https://datasearch.raihan-zidan2709.workers.dev/favicon?url=${item.displayLink}">
+                 </div>
+                 <div class="link-rw">
+                   <div class="link">
+                     ${item?.pagemap?.metatags?.[0]?.['og:site_name'] ?? item.displayLink}
+                   </div>
+                   <div class="link k">https://${item.displayLink}</div>
+                 </div>
+               </div>
+               <div class="title">${item.title}</div>
+             </a>
+           </div>
+           <div class="btm-snpt">
+             <div class="snippet">${item.snippet}</div>
+           </div>
+         </div>
+       `).join('')}
+   `, query); // Menut
+up sethtml dengan benar
+               }
+      
 const responseClone = new Response(htmlResponse, { headers: { "Content-Type": "text/html" } });
 
 let transformedResponse = new HTMLRewriter()
